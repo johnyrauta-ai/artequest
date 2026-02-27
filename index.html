@@ -3,111 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARTEQUEST</title>
+<title>ARTEQUEST 2.0</title>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(#1a1a2e,#16213e);
-    color:white;
-    text-align:center;
-}
-
-/* HEADER */
-header{
-padding:30px;
-background:linear-gradient(90deg,#0f3460,#16213e);
-box-shadow:0 4px 15px rgba(0,0,0,0.4);
-}
-
-header h1{
-font-size:48px;
 margin:0;
-letter-spacing:3px;
-background:linear-gradient(90deg,#ffd700,#ff9800);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-text-shadow:0 0 15px rgba(255,215,0,0.4);
+font-family:Verdana, sans-serif;
+background:linear-gradient(45deg,#ff6b6b,#feca57,#48dbfb,#1dd1a1);
+background-size:400% 400%;
+animation:bg 10s ease infinite;
+text-align:center;
+color:#fff;
 }
 
-header p{
-margin:6px 0;
+@keyframes bg{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
 }
 
-.subtitulo{
-font-size:20px;
-color:#f1f1f1;
+header{
+padding:20px;
+font-size:28px;
+font-weight:bold;
+text-shadow:2px 2px 5px #000;
 }
 
-.criador{
-font-size:16px;
-color:#cccccc;
-}
-
-/* BOTÕES */
 button{
-padding:10px 18px;
-margin:6px;
+padding:12px 18px;
+margin:8px;
 border:none;
-border-radius:8px;
-font-size:14px;
+border-radius:10px;
 cursor:pointer;
-background:#e94560;
-color:white;
+font-weight:bold;
+background:#341f97;
+color:#fff;
 transition:0.3s;
 }
 
 button:hover{
-background:#c73650;
-transform:scale(1.05);
+transform:scale(1.1);
+background:#5f27cd;
 }
 
-/* SEÇÕES */
-.section{
-display:none;
-padding:20px;
-}
+.section{display:none;}
+.active{display:block;}
 
-.active{
-display:block;
-}
-
-input{
-padding:8px;
-border-radius:6px;
-border:none;
-}
-
-/* BARRA DE PROGRESSO */
 .progress{
 height:15px;
-background:#444;
+background:#222;
+margin:10px;
 border-radius:10px;
-margin:15px;
 overflow:hidden;
 }
 
 .bar{
 height:100%;
-width:0%;
-background:#21e6c1;
-transition:0.5s;
+width:100%;
+background:#ff4757;
+transition:1s linear;
 }
 
-/* RANKING */
-.ranking{
-background:#0f3460;
-padding:10px;
-margin-top:15px;
-border-radius:8px;
+.shake{
+animation:shake 0.4s;
 }
 
-footer{
-margin-top:30px;
-padding:15px;
-background:#0f3460;
-font-size:14px;
+@keyframes shake{
+0%{transform:translateX(0)}
+25%{transform:translateX(-5px)}
+50%{transform:translateX(5px)}
+75%{transform:translateX(-5px)}
+100%{transform:translateX(0)}
 }
 </style>
 </head>
@@ -115,140 +81,165 @@ font-size:14px;
 <body>
 
 <header>
-<h1>🎨 ARTEQUEST</h1>
-<p class="subtitulo">Uma Jornada pela História da Arte</p>
-<p class="criador">Criado por Prof. Johny Rauta</p>
+🎮 ARTEQUEST 2.0<br>
+Uma Jornada pela História da Arte<br>
+Criado por Prof. Johny Rauta
 </header>
 
 <div id="home" class="section active">
-<button onclick="show('jogo')">🎮 Jogar</button>
-<button onclick="showProfessor()">👨‍🏫 Área do Professor</button>
+<h2>Digite seu nome:</h2>
+<input id="nome" placeholder="Seu nome">
+<br><br>
+<button onclick="iniciar()">Começar Aventura</button>
 </div>
 
-<div id="jogo" class="section">
-<h2>Digite seu nome:</h2>
-<input type="text" id="nomeAluno" placeholder="Seu nome">
-<button onclick="iniciar()">Começar</button>
-
-<div id="gameArea" style="display:none;">
-<h3 id="faseTitulo"></h3>
-<p id="pergunta"></p>
-<div id="respostas"></div>
-<p id="feedback"></p>
+<div id="game" class="section">
+<h2 id="periodo"></h2>
+<p>❤️ Vidas: <span id="vidas">3</span></p>
+<p>⭐ Pontos: <span id="pontos">0</span></p>
 
 <div class="progress">
-<div class="bar" id="progressBar"></div>
+<div class="bar" id="timerBar"></div>
 </div>
 
-<p>⭐ Pontos: <span id="pontos">0</span></p>
+<h3 id="pergunta"></h3>
+<div id="respostas"></div>
+<p id="status"></p>
 </div>
-
-<button onclick="show('home')">Voltar</button>
-</div>
-
-<div id="professor" class="section">
-<h2>📊 Ranking da Turma</h2>
-<div id="rankingLista" class="ranking"></div>
-<button onclick="show('home')">Voltar</button>
-</div>
-
-<footer>
-© 2026 - ARTEQUEST | Plataforma Educacional
-</footer>
 
 <script>
 
-let fases = [
-{titulo:"🪨 Pré-História", pergunta:"Função principal da arte pré-histórica?", respostas:["Ritual e sobrevivência","Decoração","Entretenimento"], correta:0},
-{titulo:"🏺 Egito", pergunta:"Como era representado o corpo?", respostas:["Realista","Corpo de lado e olho de frente","Abstrato"], correta:1},
-{titulo:"🏛️ Grécia", pergunta:"A arte grega valorizava:", respostas:["Proporção e harmonia","Caos","Exagero"], correta:0},
-{titulo:"🏛️ Roma", pergunta:"A arte romana era conhecida por:", respostas:["Realismo e engenharia","Cubismo","Minimalismo"], correta:0},
-{titulo:"⛪ Medieval", pergunta:"Grande destaque medieval:", respostas:["Arte religiosa e vitrais","Grafite","Pop art"], correta:0},
-{titulo:"🎨 Renascimento", pergunta:"Característica do Renascimento:", respostas:["Perspectiva","Arte digital","Abstração total"], correta:0},
-{titulo:"✨ Barroco", pergunta:"O Barroco valorizava:", respostas:["Drama e emoção","Simplicidade","Geometria fria"], correta:0},
-{titulo:"🎭 Moderna", pergunta:"Artista do Cubismo:", respostas:["Picasso","Michelangelo","Monet"], correta:0},
-{titulo:"🖌️ Contemporânea", pergunta:"Arte contemporânea pode ser:", respostas:["Diversa e experimental","Apenas pintura clássica","Somente religiosa"], correta:0}
+let periodos=[
+{
+nome:"Pré-História",
+perguntas:[
+{p:"Onde eram feitas as pinturas?",r:["Cavernas","Castelos","Museus"],c:0},
+{p:"Principal função da arte?",r:["Ritual","Decoração","Moda"],c:0},
+{p:"Animais eram representados para?",r:["Caça","Enfeite","Humor"],c:0},
+{p:"Tintas vinham de?",r:["Pigmentos naturais","Plástico","Óleo industrial"],c:0},
+{p:"Arte pré-histórica era:",r:["Simbólica","Digital","Minimalista"],c:0},
+{p:"Exemplo famoso:",r:["Lascaux","Louvre","Coliseu"],c:0}
+]
+},
+{
+nome:"Egito",
+perguntas:[
+{p:"Corpo era desenhado:",r:["De lado","De frente","Abstrato"],c:0},
+{p:"Arte egípcia era ligada à:",r:["Religião","Moda","Cinema"],c:0},
+{p:"Pirâmides eram:",r:["Túmulos","Teatros","Mercados"],c:0},
+{p:"Hieróglifos eram:",r:["Escrita","Música","Dança"],c:0},
+{p:"Cores tinham:",r:["Significado simbólico","Apenas estética","Nenhum valor"],c:0},
+{p:"Esculturas eram:",r:["Rígidas","Derretidas","Cubistas"],c:0}
+]
+}
 ];
 
-let faseAtual = 0;
-let pontos = 0;
-let nome = "";
-
-function show(sec){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.getElementById(sec).classList.add('active');
-}
+let periodoAtual=0;
+let perguntasSelecionadas=[];
+let perguntaAtual=0;
+let vidas=3;
+let pontos=0;
+let timer;
+let tempo=15;
 
 function iniciar(){
-nome = document.getElementById("nomeAluno").value;
-if(nome===""){ alert("Digite seu nome!"); return; }
-document.getElementById("gameArea").style.display="block";
-carregarFase();
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById("game").classList.add("active");
+carregarPeriodo();
 }
 
-function carregarFase(){
-let f = fases[faseAtual];
-document.getElementById("faseTitulo").innerText=f.titulo;
-document.getElementById("pergunta").innerText=f.pergunta;
+function carregarPeriodo(){
+let p=periodos[periodoAtual];
+document.getElementById("periodo").innerText="🗺️ "+p.nome;
+vidas=3;
+perguntaAtual=0;
+perguntasSelecionadas=embaralhar(p.perguntas).slice(0,5);
+mostrarPergunta();
+}
 
-let div = document.getElementById("respostas");
+function mostrarPergunta(){
+if(perguntaAtual>=perguntasSelecionadas.length){
+if(pontos>=30){
+alert("🏆 Fase concluída!");
+periodoAtual++;
+if(periodoAtual>=periodos.length){
+alert("🎉 Você zerou o ARTEQUEST!");
+location.reload();
+}else{
+carregarPeriodo();
+}
+}else{
+alert("❌ Pontuação insuficiente! Tente novamente.");
+carregarPeriodo();
+}
+return;
+}
+
+let q=perguntasSelecionadas[perguntaAtual];
+document.getElementById("pergunta").innerText=q.p;
+
+let div=document.getElementById("respostas");
 div.innerHTML="";
-
-f.respostas.forEach((resp,index)=>{
+q.r.forEach((resp,i)=>{
 let btn=document.createElement("button");
 btn.innerText=resp;
-btn.onclick=()=>responder(index);
+btn.onclick=()=>responder(i);
 div.appendChild(btn);
 });
+
+iniciarTimer();
 }
 
-function responder(index){
-if(index===fases[faseAtual].correta){
+function responder(i){
+clearInterval(timer);
+let q=perguntasSelecionadas[perguntaAtual];
+
+if(i===q.c){
 pontos+=10;
-document.getElementById("feedback").innerText="✅ Correto!";
-faseAtual++;
+if(tempo>7)pontos+=5;
+document.getElementById("status").innerText="✅ Acertou!";
 }else{
-document.getElementById("feedback").innerText="❌ Tente novamente!";
+vidas--;
+document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
+document.getElementById("status").innerText="❌ Errou!";
 }
 
+document.getElementById("vidas").innerText=vidas;
 document.getElementById("pontos").innerText=pontos;
-document.getElementById("progressBar").style.width=(faseAtual/fases.length*100)+"%";
 
-if(faseAtual>=fases.length){
-salvarRanking();
-setTimeout(()=>{
-alert("🏆 Parabéns "+nome+"! Você concluiu o ARTEQUEST!");
-resetGame();
-},1000);
+if(vidas<=0){
+alert("💀 Você perdeu todas as vidas!");
+location.reload();
+}
+
+perguntaAtual++;
+setTimeout(mostrarPergunta,1000);
+}
+
+function iniciarTimer(){
+tempo=15;
+document.getElementById("timerBar").style.width="100%";
+timer=setInterval(()=>{
+tempo--;
+document.getElementById("timerBar").style.width=(tempo/15*100)+"%";
+if(tempo<=0){
+clearInterval(timer);
+vidas--;
+document.getElementById("vidas").innerText=vidas;
+if(vidas<=0){
+alert("⏳ Tempo esgotado! Game Over!");
+location.reload();
 }else{
-setTimeout(carregarFase,1000);
+perguntaAtual++;
+mostrarPergunta();
 }
 }
-
-function salvarRanking(){
-let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
-ranking.push({nome:nome,pontos:pontos});
-ranking.sort((a,b)=>b.pontos-a.pontos);
-localStorage.setItem("ranking",JSON.stringify(ranking));
+},1000);
 }
 
-function showProfessor(){
-show("professor");
-let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
-let lista="";
-ranking.forEach((r,i)=>{
-lista += (i+1)+"º - "+r.nome+" ("+r.pontos+" pts)<br>";
-});
-document.getElementById("rankingLista").innerHTML=lista || "Nenhum registro ainda.";
-}
-
-function resetGame(){
-faseAtual=0;
-pontos=0;
-document.getElementById("gameArea").style.display="none";
-document.getElementById("pontos").innerText="0";
-document.getElementById("progressBar").style.width="0%";
-show("home");
+function embaralhar(array){
+return array.sort(()=>Math.random()-0.5);
 }
 
 </script>
