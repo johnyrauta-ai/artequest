@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTEQUEST</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(#1a1a2e,#16213e);
+    color:white;
+    text-align:center;
+}
+
+/* HEADER */
+header{
+padding:30px;
+background:linear-gradient(90deg,#0f3460,#16213e);
+box-shadow:0 4px 15px rgba(0,0,0,0.4);
+}
+
+header h1{
+font-size:48px;
+margin:0;
+letter-spacing:3px;
+background:linear-gradient(90deg,#ffd700,#ff9800);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+text-shadow:0 0 15px rgba(255,215,0,0.4);
+}
+
+header p{
+margin:6px 0;
+}
+
+.subtitulo{
+font-size:20px;
+color:#f1f1f1;
+}
+
+.criador{
+font-size:16px;
+color:#cccccc;
+}
+
+/* BOTÕES */
+button{
+padding:10px 18px;
+margin:6px;
+border:none;
+border-radius:8px;
+font-size:14px;
+cursor:pointer;
+background:#e94560;
+color:white;
+transition:0.3s;
+}
+
+button:hover{
+background:#c73650;
+transform:scale(1.05);
+}
+
+/* SEÇÕES */
+.section{
+display:none;
+padding:20px;
+}
+
+.active{
+display:block;
+}
+
+input{
+padding:8px;
+border-radius:6px;
+border:none;
+}
+
+/* BARRA DE PROGRESSO */
+.progress{
+height:15px;
+background:#444;
+border-radius:10px;
+margin:15px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:#21e6c1;
+transition:0.5s;
+}
+
+/* RANKING */
+.ranking{
+background:#0f3460;
+padding:10px;
+margin-top:15px;
+border-radius:8px;
+}
+
+footer{
+margin-top:30px;
+padding:15px;
+background:#0f3460;
+font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🎨 ARTEQUEST</h1>
+<p class="subtitulo">Uma Jornada pela História da Arte</p>
+<p class="criador">Criado por Prof. Johny Rauta</p>
+</header>
+
+<div id="home" class="section active">
+<button onclick="show('jogo')">🎮 Jogar</button>
+<button onclick="showProfessor()">👨‍🏫 Área do Professor</button>
+</div>
+
+<div id="jogo" class="section">
+<h2>Digite seu nome:</h2>
+<input type="text" id="nomeAluno" placeholder="Seu nome">
+<button onclick="iniciar()">Começar</button>
+
+<div id="gameArea" style="display:none;">
+<h3 id="faseTitulo"></h3>
+<p id="pergunta"></p>
+<div id="respostas"></div>
+<p id="feedback"></p>
+
+<div class="progress">
+<div class="bar" id="progressBar"></div>
+</div>
+
+<p>⭐ Pontos: <span id="pontos">0</span></p>
+</div>
+
+<button onclick="show('home')">Voltar</button>
+</div>
+
+<div id="professor" class="section">
+<h2>📊 Ranking da Turma</h2>
+<div id="rankingLista" class="ranking"></div>
+<button onclick="show('home')">Voltar</button>
+</div>
+
+<footer>
+© 2026 - ARTEQUEST | Plataforma Educacional
+</footer>
+
+<script>
+
+let fases = [
+{titulo:"🪨 Pré-História", pergunta:"Função principal da arte pré-histórica?", respostas:["Ritual e sobrevivência","Decoração","Entretenimento"], correta:0},
+{titulo:"🏺 Egito", pergunta:"Como era representado o corpo?", respostas:["Realista","Corpo de lado e olho de frente","Abstrato"], correta:1},
+{titulo:"🏛️ Grécia", pergunta:"A arte grega valorizava:", respostas:["Proporção e harmonia","Caos","Exagero"], correta:0},
+{titulo:"🏛️ Roma", pergunta:"A arte romana era conhecida por:", respostas:["Realismo e engenharia","Cubismo","Minimalismo"], correta:0},
+{titulo:"⛪ Medieval", pergunta:"Grande destaque medieval:", respostas:["Arte religiosa e vitrais","Grafite","Pop art"], correta:0},
+{titulo:"🎨 Renascimento", pergunta:"Característica do Renascimento:", respostas:["Perspectiva","Arte digital","Abstração total"], correta:0},
+{titulo:"✨ Barroco", pergunta:"O Barroco valorizava:", respostas:["Drama e emoção","Simplicidade","Geometria fria"], correta:0},
+{titulo:"🎭 Moderna", pergunta:"Artista do Cubismo:", respostas:["Picasso","Michelangelo","Monet"], correta:0},
+{titulo:"🖌️ Contemporânea", pergunta:"Arte contemporânea pode ser:", respostas:["Diversa e experimental","Apenas pintura clássica","Somente religiosa"], correta:0}
+];
+
+let faseAtual = 0;
+let pontos = 0;
+let nome = "";
+
+function show(sec){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(sec).classList.add('active');
+}
+
+function iniciar(){
+nome = document.getElementById("nomeAluno").value;
+if(nome===""){ alert("Digite seu nome!"); return; }
+document.getElementById("gameArea").style.display="block";
+carregarFase();
+}
+
+function carregarFase(){
+let f = fases[faseAtual];
+document.getElementById("faseTitulo").innerText=f.titulo;
+document.getElementById("pergunta").innerText=f.pergunta;
+
+let div = document.getElementById("respostas");
+div.innerHTML="";
+
+f.respostas.forEach((resp,index)=>{
+let btn=document.createElement("button");
+btn.innerText=resp;
+btn.onclick=()=>responder(index);
+div.appendChild(btn);
+});
+}
+
+function responder(index){
+if(index===fases[faseAtual].correta){
+pontos+=10;
+document.getElementById("feedback").innerText="✅ Correto!";
+faseAtual++;
+}else{
+document.getElementById("feedback").innerText="❌ Tente novamente!";
+}
+
+document.getElementById("pontos").innerText=pontos;
+document.getElementById("progressBar").style.width=(faseAtual/fases.length*100)+"%";
+
+if(faseAtual>=fases.length){
+salvarRanking();
+setTimeout(()=>{
+alert("🏆 Parabéns "+nome+"! Você concluiu o ARTEQUEST!");
+resetGame();
+},1000);
+}else{
+setTimeout(carregarFase,1000);
+}
+}
+
+function salvarRanking(){
+let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+ranking.push({nome:nome,pontos:pontos});
+ranking.sort((a,b)=>b.pontos-a.pontos);
+localStorage.setItem("ranking",JSON.stringify(ranking));
+}
+
+function showProfessor(){
+show("professor");
+let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+let lista="";
+ranking.forEach((r,i)=>{
+lista += (i+1)+"º - "+r.nome+" ("+r.pontos+" pts)<br>";
+});
+document.getElementById("rankingLista").innerHTML=lista || "Nenhum registro ainda.";
+}
+
+function resetGame(){
+faseAtual=0;
+pontos=0;
+document.getElementById("gameArea").style.display="none";
+document.getElementById("pontos").innerText="0";
+document.getElementById("progressBar").style.width="0%";
+show("home");
+}
+
+</script>
+
+</body>
+</html>
